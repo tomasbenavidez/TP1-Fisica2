@@ -26,7 +26,7 @@ print(R_v)
 # Graficar
 plt.figure(figsize=(10, 6))
 plt.scatter(resitencias, R_v, label='Resistencia del Multímetro', color='darkblue')
-plt.title('Resistencia del Multímetro vs Resistencia Nominal', fontsize=16, fontweight='bold')
+#plt.title('Resistencia del Multímetro vs Resistencia Nominal', fontsize=16, fontweight='bold')
 plt.xlabel('Resistencia Nominal (Ω)', fontsize=14)
 plt.ylabel('Resistencia del Multímetro (Ω)', fontsize=14)
 plt.legend(fontsize=12)
