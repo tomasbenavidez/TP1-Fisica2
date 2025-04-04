@@ -47,7 +47,7 @@ for i in range(len(resistencia_10k)):
     )
 
 # Configuración del gráfico 1
-plt.title('Voltaje vs Corriente para Resistencia de 10kΩ', fontsize=16, fontweight='bold')
+#plt.title('Voltaje vs Corriente para Resistencia de 10kΩ', fontsize=16, fontweight='bold')
 plt.xlabel('Voltaje (V)', fontsize=14)
 plt.ylabel('Corriente (A)', fontsize=14)
 plt.legend(fontsize=12)
@@ -70,7 +70,7 @@ for i in range(len(resistencia_96_8)):
     )
 
 # Configuración del gráfico 2
-plt.title('Voltaje vs Corriente para Resistencia de 96.8Ω', fontsize=16, fontweight='bold')
+#plt.title('Voltaje vs Corriente para Resistencia de 96.8Ω', fontsize=16, fontweight='bold')
 plt.xlabel('Voltaje (V)', fontsize=14)
 plt.ylabel('Corriente (A)', fontsize=14)
 plt.legend(fontsize=12)
@@ -100,7 +100,7 @@ for i in range(len(resistencia_4_62k)):
         color='gray', linestyle=':', linewidth=1
     )
 # Configuracion del gráfico 3
-plt.title('Voltaje vs Corriente para Resistencia de 4.62kΩ', fontsize=16, fontweight='bold')
+#plt.title('Voltaje vs Corriente para Resistencia de 4.62kΩ', fontsize=16, fontweight='bold')
 plt.xlabel('Voltaje (V)', fontsize=14)
 plt.ylabel('Corriente (A)', fontsize=14)
 plt.legend(fontsize=12)
