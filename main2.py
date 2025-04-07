@@ -14,19 +14,18 @@ volt_multimetro = df.iloc[:, 2].apply(lambda x: str(x).replace(',', '.')).apply(
 
 print(resitencias)
 print(volt_fuente)
-print(volt_multimetro)
-
-#calcular el valor de la resistencia del multimetro
-#V_v = V_0 / (R / R_V) + 1))
-#                                                                                                                                                                   
+print(volt_multimetro)                                                                                                                                            
 
 R_v = volt_multimetro * resitencias / (volt_fuente - volt_multimetro)
+R_promedio = R_v.mean()
 print(R_v)
+
 
 # Graficar
 plt.figure(figsize=(10, 6))
 plt.scatter(resitencias, R_v, label='Resistencia del Multímetro', color='darkblue')
 plt.title('Resistencia del Multímetro vs Resistencia Nominal', fontsize=16, fontweight='bold')
+plt.axhline(y=R_promedio, color='red', linestyle='--', label=f'R promedio = {R_promedio:.2f} Ω')
 plt.xlabel('Resistencia Nominal (Ω)', fontsize=14)
 plt.ylabel('Resistencia del Multímetro (Ω)', fontsize=14)
 plt.legend(fontsize=12)
