@@ -41,7 +41,7 @@ plt.errorbar(
     fmt='o',
     label='Error abs',
     color='darkblue',
-    ecolor='red',
+    ecolor='gray',
     capsize=4
 )
 plt.xlabel('Voltaje (V)', fontsize=14)
@@ -85,7 +85,7 @@ plt.errorbar(
     fmt='o',
     label='Error abs',
     color='darkblue',
-    ecolor='red',
+    ecolor='gray',
     capsize=4
 )
 plt.xlabel('Voltaje (V)', fontsize=14)
@@ -115,7 +115,7 @@ resistencia_4_62k['Error abs'] = resistencia_4_62k['Residuos'].abs()
 plt.figure(figsize=(10, 6))
 plt.plot(resistencia_4_62k['Voltaje (V)'], resistencia_4_62k['Corriente (A)'],
          label='Experimental', marker='o', color='darkblue')
-plt.plot(resistencia_4_62k['Voltaje (V)'], resistencia_4_62k['Corriente Teórica (A)'],
+plt.plot(resistencia_4_62k['Voltaje (V)'].to_list(), resistencia_4_62k['Corriente Teórica (A)'].to_list(),
          label='Teórica', color='orange')
 
 # Líneas de residuos (verticales)
@@ -134,7 +134,7 @@ plt.errorbar(
     fmt='o',
     label='Error abs',
     color='darkblue',
-    ecolor='red',
+    ecolor='grey',
     capsize=4
 )
 plt.xlabel('Voltaje (V)', fontsize=14)
