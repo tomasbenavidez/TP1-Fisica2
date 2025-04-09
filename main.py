@@ -1,122 +1,127 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from scipy.optimize import curve_fit
 import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
 
-# Set a professional style for the plots
-sns.set_theme(style="whitegrid")
-
-# Cargar los datos
 data = pd.read_csv('datos.csv', header=None)
 
-# Función lineal para el ajuste
-def linear_fit(V, R):
-    return V / R  # I = V / R
+# resistencia = data.iloc[:26, :2]  
+# resistencia.columns = ['Voltaje (V)', 'Corriente (A)']
+# resistencia = resistencia.apply(pd.to_numeric, errors='coerce').dropna()
 
-#---------Resistencia 10k----------
-resistencia_10k = data.iloc[:26, :2]  # Filas correspondientes a la resistencia de 10k ohm
-resistencia_10k.columns = ['Voltaje (V)', 'Corriente (mA)']
-resistencia_10k = resistencia_10k.apply(pd.to_numeric, errors='coerce').dropna()
+# # miliamperes
+# resistencia['Corriente (mA)'] = resistencia['Corriente (A)'] * 1000
 
-# Convertir corriente a mA
-resistencia_10k['Corriente (mA)'] *= 1000
+# def modelo_lineal(V, m, b):
+#     return m * V + b
 
-# Ajuste lineal
-popt, pcov = curve_fit(linear_fit, resistencia_10k['Voltaje (V)'], resistencia_10k['Corriente (mA)'])
-R_ajustada = popt[0]
-error_R = np.sqrt(np.diag(pcov))[0]
+# popt, pcov = curve_fit(modelo_lineal, resistencia['Voltaje (V)'], resistencia['Corriente (mA)'])
+# pendiente, ordenada = popt
+# error_pendiente, error_ordenada = np.sqrt(np.diag(pcov))
 
+# R = 1000 / pendiente  #  ohmios
+# error_R = 1000 * error_pendiente / pendiente**2
 
-# Graficar
-plt.figure(figsize=(10, 6))
-plt.scatter(resistencia_10k['Voltaje (V)'], resistencia_10k['Corriente (mA)'], label='Datos experimentales', color='darkblue')
-plt.plot(resistencia_10k['Voltaje (V)'], linear_fit(resistencia_10k['Voltaje (V)'], R_ajustada), label=f'Ajuste lineal\nR = {R_ajustada:.2f} ± {error_R:.2f} kΩ', color='orange')
+# # Error del multímetro (según especificaciones)
+# error_voltaje_multimetro = 0.01 / 100 * resistencia['Voltaje (V)'] + 0.002  # 0.01% + 2 mV
+# error_corriente_multimetro = 0.01 / 100 * resistencia['Corriente (mA)'] + 5  # 0.01% + 5 mA
 
-# Calcular el error de medición
-resistencia_10k['Error Corriente (mA)'] = resistencia_10k['Corriente (mA)'] * 0.05  # Ejemplo: 5% de error
-resistencia_10k['Error Voltaje (V)'] = resistencia_10k['Voltaje (V)'] * 0.05  # Ejemplo: 5% de error
+# # Error total de la resistencia
+# error_R_total = np.sqrt(error_R**2 + (error_voltaje_multimetro.mean() / resistencia['Voltaje (V)'].mean())**2)
 
-# Graficar los errores
-plt.errorbar(resistencia_10k['Voltaje (V)'], resistencia_10k['Corriente (mA)'],
-             xerr=resistencia_10k['Error Voltaje (V)'], yerr=resistencia_10k['Error Corriente (mA)'],
-             fmt='o', color='darkblue', label='Datos experimentales con error')
+# # Imprimir resultados con el error total
+# print(f"Resistencia ajustada: R = {R:.2f} Ω ± {error_R_total:.2f} Ω")
+# print(f"Ordenada al origen: b = {ordenada:.2f} mA ± {error_ordenada:.2f} mA")
 
-plt.xlabel('Voltaje (V)', fontsize=14)
-plt.ylabel('Corriente (mA)', fontsize=14)
-plt.legend(fontsize=12)
-plt.xticks(fontsize=12)
-plt.yticks(fontsize=12)
-plt.grid(True, linestyle='--', alpha=0.7)
-plt.tight_layout()
-plt.show()
+# # Graficar con barras de error
+# plt.figure(figsize=(10, 6))
+# plt.errorbar(
+#     resistencia['Voltaje (V)'], resistencia['Corriente (mA)'],
+#     xerr=error_voltaje_multimetro, yerr=error_corriente_multimetro,
+#     fmt='o', label='Datos experimentales (con error)', color='navy', ecolor='blue', capsize=7, elinewidth=1.5
+# )
+# plt.plot(
+#     resistencia['Voltaje (V)'], modelo_lineal(resistencia['Voltaje (V)'], *popt),
+#     color='orange', label='Ajuste lineal'
+# )
 
-#---------Resistencia 96.8----------
-resistencia_96_8 = data.iloc[28:42, :2]  # Filas correspondientes a la resistencia de 96.8 ohm
-resistencia_96_8.columns = ['Voltaje (V)', 'Corriente (mA)']
-resistencia_96_8 = resistencia_96_8.apply(pd.to_numeric, errors='coerce').dropna()
+# # Etiquetas y leyenda
+# plt.xlabel('Voltaje (V)', fontsize=14)
+# plt.ylabel('Corriente (mA)', fontsize=14)
+# plt.legend(fontsize=12)
+# plt.grid(True)
 
-# Convertir corriente a mA
-resistencia_96_8['Corriente (mA)'] *= 1000
+# # Texto con resultados
+# texto = f"R = {R:.2f} Ω ± {error_R_total:.2f} Ω"
+# plt.text(resistencia['Voltaje (V)'].min() * 1.1, resistencia['Corriente (mA)'].max() * 0.9, texto, fontsize=12, bbox=dict(facecolor='white', alpha=0.7))
 
-# Ajuste lineal
-popt, pcov = curve_fit(linear_fit, resistencia_96_8['Voltaje (V)'], resistencia_96_8['Corriente (mA)'])
-R_ajustada = popt[0]
-error_R = np.sqrt(np.diag(pcov))[0]
+# plt.tight_layout()
+# plt.show()
 
-# Graficar
-plt.figure(figsize=(10, 6))
-plt.scatter(resistencia_96_8['Voltaje (V)'], resistencia_96_8['Corriente (mA)'], label='Datos experimentales', color='darkblue')
-plt.plot(resistencia_96_8['Voltaje (V)'], linear_fit(resistencia_96_8['Voltaje (V)'], R_ajustada), label=f'Ajuste lineal\nR = {R_ajustada:.2f} ± {error_R:.2f} Ω', color='orange')
+def graficos1(data, filas, nombre_resistencia):
+    """
+    Genera un gráfico con ajuste lineal y barras de error para una resistencia específica.
 
-resistencia_96_8['Error Corriente (mA)'] = resistencia_96_8['Corriente (mA)'] * 0.05  # Ejemplo: 5% de error
-resistencia_96_8['Error Voltaje (V)'] = resistencia_96_8['Voltaje (V)'] * 0.05  # Ejemplo: 5% de error
+    Parámetros:
+    - data: DataFrame con los datos experimentales.
+    - filas: Tupla con el rango de filas correspondientes a la resistencia (inicio, fin).
+    - nombre_resistencia: Nombre de la resistencia para el título del gráfico.
+    """
+    # Filtrar los datos para la resistencia específica
+    resistencia = data.iloc[filas[0]:filas[1], :2]
+    resistencia.columns = ['Voltaje (V)', 'Corriente (A)']
+    resistencia = resistencia.apply(pd.to_numeric, errors='coerce').dropna()
 
-# Graficar los errores
-plt.errorbar(resistencia_96_8['Voltaje (V)'], resistencia_96_8['Corriente (mA)'],
-             xerr=resistencia_96_8['Error Voltaje (V)'], yerr=resistencia_96_8['Error Corriente (mA)'],
-             fmt='o', color='darkblue', label='Datos experimentales con error')
+    # Convertir corriente a miliamperes
+    resistencia['Corriente (mA)'] = resistencia['Corriente (A)'] * 1000
 
-plt.xlabel('Voltaje (V)', fontsize=14)
-plt.ylabel('Corriente (mA)', fontsize=14)
-plt.legend(fontsize=12)
-plt.xticks(fontsize=12)
-plt.yticks(fontsize=12)
-plt.grid(True, linestyle='--', alpha=0.7)
-plt.tight_layout()
-plt.show()
+    # Definir el modelo lineal
+    def modelo_lineal(V, m, b):
+        return m * V + b
 
-#---------Resistencia 4.62k----------
-resistencia_4_62k = data.iloc[43:54, :2]  # Filas correspondientes a la resistencia de 4.62k ohm
-resistencia_4_62k.columns = ['Voltaje (V)', 'Corriente (mA)']
-resistencia_4_62k = resistencia_4_62k.apply(pd.to_numeric, errors='coerce').dropna()
+    # Ajuste lineal
+    popt, pcov = curve_fit(modelo_lineal, resistencia['Voltaje (V)'], resistencia['Corriente (mA)'])
+    pendiente, ordenada = popt
+    error_pendiente, error_ordenada = np.sqrt(np.diag(pcov))
 
-# Convertir corriente a mA
-resistencia_4_62k['Corriente (mA)'] *= 1000
+    # Calcular la resistencia y su error
+    R = 1000 / pendiente  # ohmios
+    error_R = 1000 * error_pendiente / pendiente**2
 
-# Ajuste lineal
-popt, pcov = curve_fit(linear_fit, resistencia_4_62k['Voltaje (V)'], resistencia_4_62k['Corriente (mA)'])
-R_ajustada = popt[0]
-error_R = np.sqrt(np.diag(pcov))[0]
+    # Error del multímetro (según especificaciones)
+    error_voltaje_multimetro = 0.01 / 100 * resistencia['Voltaje (V)'] + 0.002  # 0.01% + 2 mV
+    error_corriente_multimetro = 0.01 / 100 * resistencia['Corriente (mA)'] + 5  # 0.01% + 5 mA
 
-# Graficar
-plt.figure(figsize=(10, 6))
-plt.scatter(resistencia_4_62k['Voltaje (V)'], resistencia_4_62k['Corriente (mA)'], label='Datos experimentales', color='darkblue')
-plt.plot(resistencia_4_62k['Voltaje (V)'], linear_fit(resistencia_4_62k['Voltaje (V)'], R_ajustada), label=f'Ajuste lineal\nR = {R_ajustada:.2f} ± {error_R:.2f} kΩ', color='orange')
+    # Error total de la resistencia
+    error_R_total = np.sqrt(error_R**2 + (error_voltaje_multimetro.mean() / resistencia['Voltaje (V)'].mean())**2)
 
-resistencia_4_62k['Error Corriente (mA)'] = resistencia_4_62k['Corriente (mA)'] * 0.05  # Ejemplo: 5% de error
-resistencia_4_62k['Error Voltaje (V)'] = resistencia_4_62k['Voltaje (V)'] * 0.05  # Ejemplo: 5% de error
+    # Graficar con barras de error
+    plt.figure(figsize=(10, 6))
+    plt.errorbar(
+        resistencia['Voltaje (V)'], resistencia['Corriente (mA)'],
+        xerr=error_voltaje_multimetro, yerr=error_corriente_multimetro,
+        fmt='o', label='Datos experimentales (con error)', color='navy', ecolor='darkblue', capsize=7, elinewidth=1.5
+    )
+    plt.plot(
+        resistencia['Voltaje (V)'], modelo_lineal(resistencia['Voltaje (V)'], *popt),
+        color='orange', label='Ajuste lineal'
+    )
 
-# Graficar los errores
-plt.errorbar(resistencia_4_62k['Voltaje (V)'], resistencia_4_62k['Corriente (mA)'],
-                xerr=resistencia_4_62k['Error Voltaje (V)'], yerr=resistencia_4_62k['Error Corriente (mA)'],
-                fmt='o', color='darkblue', label='Datos experimentales con error')
+    # Etiquetas y leyenda
+    plt.xlabel('Voltaje (V)', fontsize=14)
+    plt.ylabel('Corriente (mA)', fontsize=14)
+    plt.title(f'Ajuste lineal - {nombre_resistencia}', fontsize=16)
+    plt.legend(fontsize=12)
+    plt.grid(True)
 
-plt.xlabel('Voltaje (V)', fontsize=14)
-plt.ylabel('Corriente (mA)', fontsize=14)
-plt.legend(fontsize=12)
-plt.xticks(fontsize=12)
-plt.yticks(fontsize=12)
-plt.grid(True, linestyle='--', alpha=0.7)
-plt.tight_layout()
-plt.show()
+    # Texto con resultados
+    texto = f"R = {R:.2f} Ω ± {error_R_total:.2f} Ω\nb = {ordenada:.2f} mA ± {error_ordenada:.2f} mA"
+    plt.text(resistencia['Voltaje (V)'].min() * 1.1, resistencia['Corriente (mA)'].max() * 0.9, texto, fontsize=12, bbox=dict(facecolor='white', alpha=0.7))
+
+    plt.tight_layout()
+    plt.show()
+
+# Graficar para diferentes resistencias
+graficos1(data, (0, 26), "Resistencia 1 (10 kΩ)")
+graficos1(data, (28, 42), "Resistencia 2 (96.8 Ω)")
+graficos1(data, (43, 54), "Resistencia 3 (4.62 kΩ)")
