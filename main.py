@@ -31,7 +31,7 @@ plt.scatter(resistencia['Voltaje (V)'], resistencia['Corriente (mA)'], label='Da
 plt.plot(resistencia['Voltaje (V)'], modelo_lineal(resistencia['Voltaje (V)'], *popt), color='orange', label='Ajuste lineal')
 plt.xlabel('Voltaje (V)', fontsize=14)
 plt.ylabel('Corriente (mA)', fontsize=14)
-plt.title('Ajuste lineal - Resistencia desconocida')
+plt.title('Ajuste lineal - Resistencia 10')
 plt.legend()
 plt.grid(True)
 
