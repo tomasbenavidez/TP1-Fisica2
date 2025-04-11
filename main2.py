@@ -3,49 +3,43 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-df = pd.read_csv('datos2.csv')
+# Cargar los datos
+df = pd.read_csv('datos2.csv')  # Cambiá a la ruta correcta si lo corrés localmente
 
-#separar los datos
-I = 0.28 #Corriente maxima en amperios 
+# Convertir texto a números (por si vienen con comas decimales)
+df["resistencia (Mohm)"] = df["resistencia (Mohm)"].astype(str).str.replace(",", ".").astype(float)
+df["Volt Fuente"] = df["Volt Fuente"].astype(str).str.replace(",", ".").astype(float)
+df["Volt Multimetro"] = df["Volt Multimetro"].astype(str).str.replace(",", ".").astype(float)
 
-resistencias = df.iloc[:, 0].apply(pd.to_numeric, errors='coerce')
-volt_fuente = df.iloc[:, 1].apply(lambda x: str(x).replace(',', '.')).apply(pd.to_numeric, errors='coerce')
-volt_multimetro = df.iloc[:, 2].apply(lambda x: str(x).replace(',', '.')).apply(pd.to_numeric, errors='coerce')
+# Extraer columnas
+R = df["resistencia (Mohm)"]
+V_fuente = df["Volt Fuente"]
+V_mult = df["Volt Multimetro"]
 
-# Calcular el valor de la resistencia del multímetro
-R_v = volt_multimetro * resistencias / (volt_fuente - volt_multimetro)
+# Cálculo de Rv (resistencia interna del voltímetro)
+Rv = R * V_mult / (V_fuente - V_mult)
 
-# Calcular error de R_v por propagación de incertidumbre
-delta_Vf = 0.1   # Error en voltaje de fuente
-delta_Vm = 0.01  # Error en voltaje de multímetro
+# Estimación del error:
+# - 5% de tolerancia en la resistencia (horizontal)
+# - 10% de incertidumbre relativa en Rv como estimación (vertical)
+err_R = R * 0.05
+err_Rv = Rv * 0.10
 
-rel_error_Vm = delta_Vm / volt_multimetro
-rel_error_Vf = delta_Vf / (volt_fuente - volt_multimetro)
-R_v_error = R_v * np.sqrt(rel_error_Vm**2 + rel_error_Vf**2)
-
-# Imprimir resultados
-print("\nResistencias:")
-print(resistencias)
-print("\nVoltaje fuente:")
-print(volt_fuente)
-print("\nVoltaje multímetro:")
-print(volt_multimetro)
-print("\nR_v calculado:")
-print(R_v)
-print("\nError estimado en R_v:")
-print(R_v_error)
+# Calcular promedio de Rv
+Rv_prom = Rv.mean()
 
 # Graficar con barras de error
-plt.figure(figsize=(10, 6))
-plt.errorbar(resistencias, R_v, yerr=R_v_error, fmt='o', capsize=5,
-             label='Resistencia del Multímetro con error', color='darkblue')
-plt.xlabel('Resistencia Nominal (MΩ)', fontsize=14)
-plt.ylabel('Resistencia Interna del Multímetro $R_V$ (MΩ)', fontsize=14)
-#plt.title('Estimación de $R_V$ con Barras de Error', fontsize=16, fontweight='bold')
-plt.legend(fontsize=12)
-plt.xticks(fontsize=12)
-plt.yticks(fontsize=12)
-plt.xlim(2.5, 6.5)
-plt.grid(True, linestyle='--', alpha=0.7)
+plt.figure(figsize=(8, 5))
+plt.errorbar(R, Rv, xerr=err_R, yerr=err_Rv,color='blue', fmt='o', label="Mediciones", capsize=5)
+
+# Línea horizontal con el promedio
+plt.axhline(Rv_prom, color='red', linestyle='--', label=f"Promedio $R_V$ ≈ {Rv_prom:.2f} MΩ")
+
+# Estética
+plt.xlabel("Resistencia conectada (MΩ)")
+plt.ylabel("Resistencia interna estimada del voltímetro $R_V$ (MΩ)")
+plt.title("Estimación de $R_V$ con barras de error")
+plt.legend()
+plt.grid(True)
 plt.tight_layout()
 plt.show()
