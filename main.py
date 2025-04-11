@@ -73,23 +73,18 @@ def graficos1_invertido(data, filas, nombre_resistencia):
     def modelo_lineal(I, m, b):
         return m * I + b  # V = m*I + b
 
-    # Ajustar: Voltaje en función de Corriente
     popt, pcov = curve_fit(modelo_lineal, resistencia['Corriente (mA)'], resistencia['Voltaje (V)'])
     pendiente, ordenada = popt
     error_pendiente, error_ordenada = np.sqrt(np.diag(pcov))
 
-    # Calcular resistencia y error
-    R = pendiente  # ya está en ohmios (V/mA → Ω)
-    error_R = error_pendiente
+    R = pendiente *1000  #es v/a
+    error_R = error_pendiente * 1000
 
-    # Errores del multímetro
     error_voltaje_multimetro = 0.01 / 100 * resistencia['Voltaje (V)'] + 0.002
     error_corriente_multimetro = 0.01 / 100 * resistencia['Corriente (mA)'] + 5
 
-    # Error total
     error_R_total = np.sqrt(error_R**2 + (error_corriente_multimetro.mean() / resistencia['Corriente (mA)'].mean())**2)
 
-    # Gráfico
     plt.figure(figsize=(10, 6))
     plt.errorbar(
         resistencia['Corriente (mA)'], resistencia['Voltaje (V)'],
@@ -97,20 +92,17 @@ def graficos1_invertido(data, filas, nombre_resistencia):
         fmt='o', label='Datos experimentales (con error)', color='navy', ecolor='darkblue', capsize=7, elinewidth=1.5
     )
 
-    # Gráfica del ajuste
     I_fit = np.linspace(resistencia['Corriente (mA)'].min(), resistencia['Corriente (mA)'].max(), 100)
     V_fit = modelo_lineal(I_fit, *popt)
     plt.plot(I_fit, V_fit, color='orange', label='Ajuste lineal')
 
-    # Etiquetas
-    plt.xlabel('Corriente (mA)', fontsize=14)
-    plt.ylabel('Voltaje (V)', fontsize=14)
-    plt.title(f'Ajuste lineal invertido - {nombre_resistencia}', fontsize=16)
-    plt.legend(fontsize=12)
+    plt.xlabel('Corriente (mA)', fontsize=18)
+    plt.ylabel('Voltaje (V)', fontsize=18)
+    plt.title(f'{nombre_resistencia}', fontsize=16)
+    plt.legend(fontsize=14)
     plt.grid(True)
 
-    # Texto con resultados
-    texto = f"R = {R:.2f} Ω ± {error_R_total:.2f} Ω\nb = {ordenada:.2f} V ± {error_ordenada:.2f} V"
+    texto = f"R = {R:.2f} Ω ± {error_R_total:.2f} Ω\n "
     plt.text(resistencia['Corriente (mA)'].min() * 1.1, resistencia['Voltaje (V)'].max() * 0.9, texto, fontsize=12, bbox=dict(facecolor='white', alpha=0.7))
 
     plt.tight_layout()
